@@ -1,11 +1,14 @@
 # Visualizing the Investment in the Neighborhoods of Toronto
 
-This is a technical test of visualizing the investment in the neighborhoods of Toronto and the relative Tax Estimation on Residential Properties in those neighborhoods, using matplotlib/numpy/basemap/descartes in Python.
+This is a technical test of visualizing the investment in the neighborhoods
+of Toronto and the relative Tax Estimation on Residential Properties in
+those neighborhoods, using matplotlib/numpy/basemap/descartes in Python.
 
 # Open Data used from the City of Toronto
 
-Several geographical data sources of the Open Data initiative of the City of Toronto are used (taken to the WGS84 coordinate system, which
-most of them offer):
+Several geographical data sources of the Open Data initiative of the City
+of Toronto are used (taken to the WGS84 coordinate system, which most of
+them offer):
 
 [City Wards](http://www1.toronto.ca/wps/portal/contentonly?vgnextoid=b1533f0aacaaa210VgnVCM1000006cd60f89RCRD)
 
@@ -15,11 +18,25 @@ most of them offer):
 
 [Current Value Assessment (CVA) Tax Impact Residential Properties](http://www1.toronto.ca/wps/portal/contentonly?vgnextoid=b40a57200ff2f210VgnVCM1000003dd60f89RCRD)
 
+The script `download_Open_Data_sources_Toronto.sh` is given to download
+these GIS shapefiles and prepare them to the WGS84 coordinate system (if
+necessary).
+
 # The very First Version of the Visualization
 
-This is the very first version of the [Visualization](TO_developm_neighborhoods.png). Further work on this is coming.
+This is the very first version of the
+[Visualization](TO_developm_neighborhoods.png). Further work on this is
+coming.
 
 # Analysis
 
-As mentioned above, this is just a technical test of visualizing the investment in the neighborhoods of Toronto and relative Tax Estimation on Residential Properties: a more throughout Data Mining could be possible as to visualize why certain neighborhoods are chosen, etc, but these are social and urban planning projections for the future of Toronto, so Data Mining on them could be computationally expensive. (This could be interesting and useful on its own: the City of Toronto offers many more sources of information in its [Open Data program](http://www1.toronto.ca/wps/portal/contentonly?vgnextoid=9e56e03bb8d1e310VgnVCM10000071d60f89RCRD).)
+As mentioned above, this is just a technical test of visualizing the
+investment in the neighborhoods of Toronto and relative Tax Estimation
+on Residential Properties: a more throughout Data Mining could be
+possible as to visualize why certain neighborhoods are chosen, etc,
+but these are social and urban planning projections for the future of
+Toronto, so Data Mining on them could be computationally expensive.
+(This could be interesting and useful on its own: the City of Toronto
+offers many more sources of information in its
+[Open Data program](http://www1.toronto.ca/wps/portal/contentonly?vgnextoid=9e56e03bb8d1e310VgnVCM10000071d60f89RCRD).)
 
