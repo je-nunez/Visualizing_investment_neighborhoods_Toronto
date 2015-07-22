@@ -1,6 +1,6 @@
-# Visualizing the Investment in the Neighborhoods of Toronto and relative Tax Estimation on Residential Properties
+# Visualizing the Investment in the Neighborhoods of Toronto
 
-This is a technical test of visualizing the investment in the neighborhoods of Toronto and relative Tax Estimation on Residential Properties
+This is a technical test of visualizing the investment in the neighborhoods of Toronto and the relative Tax Estimation on Residential Properties in those neighborhoods, using matplotlib/numpy/basemap/descartes in Python.
 
 # Open Data used from the City of Toronto
 
@@ -21,5 +21,5 @@ This is the very first version of the [Visualization](TO_developm_neighborhoods.
 
 # Analysis
 
-As mentioned above, this is just a technical test of visualizing the investment in the neighborhoods of Toronto and relative Tax Estimation on Residential Properties: a more throughout Data Mining could be possible as to visualize why certain neighborhoods are chosen, etc, but these are social and urban planning projections for the future of Toronto, so Data Mining on them could be computationally expensive. (This could be interesting and useful on its own: the City of Toronto offers many more sources of information in its [Open Data program](http://www1.toronto.ca/wps/portal/contentonly?vgnextoid=9e56e03bb8d1e310VgnVCM10000071d60f89RCRD)
+As mentioned above, this is just a technical test of visualizing the investment in the neighborhoods of Toronto and relative Tax Estimation on Residential Properties: a more throughout Data Mining could be possible as to visualize why certain neighborhoods are chosen, etc, but these are social and urban planning projections for the future of Toronto, so Data Mining on them could be computationally expensive. (This could be interesting and useful on its own: the City of Toronto offers many more sources of information in its [Open Data program](http://www1.toronto.ca/wps/portal/contentonly?vgnextoid=9e56e03bb8d1e310VgnVCM10000071d60f89RCRD).)
 
