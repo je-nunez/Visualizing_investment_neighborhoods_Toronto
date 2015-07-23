@@ -38,5 +38,5 @@ but these are social and urban planning projections for the future of
 Toronto, so Data Mining on them could be computationally expensive.
 (This could be interesting and useful on its own: the City of Toronto
 offers many more sources of information in its
-[Open Data program](http://www1.toronto.ca/wps/portal/contentonly?vgnextoid=9e56e03bb8d1e310VgnVCM10000071d60f89RCRD).)
+[Open Data program](http://www.toronto.ca/open).)
 
