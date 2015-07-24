@@ -18,7 +18,7 @@ them offer):
 
 [Current Value Assessment (CVA) Tax Impact Residential Properties](http://www1.toronto.ca/wps/portal/contentonly?vgnextoid=b40a57200ff2f210VgnVCM1000003dd60f89RCRD)
 
-The script `download_Open_Data_sources_Toronto.sh` is given to download
+The script `download_investm_shapefiles_toronto.sh` is given to download
 these GIS shapefiles and prepare them to the WGS84 coordinate system (if
 necessary).
 
