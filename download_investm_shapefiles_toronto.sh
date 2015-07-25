@@ -50,3 +50,8 @@ convert_shapefile  TO_busin_improv_area.shp \
 download_and_unzip 'http://www1.toronto.ca/City_Of_Toronto/Information_Technology/Open_Data/Data_Sets/Assets/Files/CVA_Tax_Impact_WGS84_(2011).zip' \
                    'CVA_Tax_Impact_WGS84_(2011).zip'
 
+# This is the Capital Budget and Plan per City Ward
+# http://www1.toronto.ca/wps/portal/contentonly?vgnextoid=1dc340271f8e3310VgnVCM1000003dd60f89RCRD
+
+wget --quiet -O budget_per_city_ward.xlsx \
+    'http://www1.toronto.ca/City%20Of%20Toronto/Information%20&%20Technology/Open%20Data/Data%20Sets/Assets/Files/2015%20staff%20recommended%20capital%20projects%20by%20ward.xlsx'

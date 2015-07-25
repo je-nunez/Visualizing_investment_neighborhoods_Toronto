@@ -4,6 +4,11 @@ This is a technical test of visualizing the investment in the neighborhoods
 of Toronto and the relative Tax Estimation on Residential Properties in
 those neighborhoods, using matplotlib/numpy/basemap/descartes in Python.
 
+# WIP
+
+This project is a *work in progress*. The implementation is *incomplete*
+and subject to change. The documentation can be inaccurate.
+
 # Open Data used from the City of Toronto
 
 Several geographical data sources of the Open Data initiative of the City
