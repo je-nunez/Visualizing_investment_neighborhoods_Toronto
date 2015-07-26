@@ -12,6 +12,12 @@ each ward according to its budget
 
 import re
 import xlrd
+import matplotlib.pyplot as plt
+from mpl_toolkits.basemap import Basemap
+from matplotlib.patches import Polygon
+from matplotlib.collections import PatchCollection
+from matplotlib.colors import Normalize
+import numpy as np
 
 
 class TorontoBudgetForecastPerCityWard(object):
@@ -100,9 +106,11 @@ class TorontoBudgetForecastPerCityWard(object):
         # adding it above in the for-loop, year by year in this time span,
         # so validate this ETL too
         if total_ward_budget != accum_budget_per_ward:
-            print "Something strange in 10-years Total for this Ward %d: Explicit Total and Calculated Total don't agree: %f %f (%f)" % \
-                  (ward_number, total_ward_budget, accum_budget_per_ward,
-                   (total_ward_budget - accum_budget_per_ward))
+            print "Something strange in 10-years Total for this Ward %d: " \
+                "Explicit Total and Calculated Total don't agree: " \
+                "%f %f (difference: %f)" % \
+                (ward_number, total_ward_budget, accum_budget_per_ward,
+                 (total_ward_budget - accum_budget_per_ward))
             return  # ignore this seemingly Ward Total row
 
         self._total_budget_per_ward[ward_number] = accum_budget_per_ward
@@ -177,16 +185,99 @@ class TorontoBudgetForecastPerCityWard(object):
 
         xl_workbook.release_resources()
 
-        print self._budget
-        print self._total_budget_per_ward
+        # print self._budget
+        # print self._total_budget_per_ward
+
+    def _plot_ward_budget_with_color(self, to_map, axes):
+        """Plot the budget per city ward, coloring each polygon according to
+        "the ward's budget.
+
+        to_map: the Basemap with the map of Toronto
+
+        axes: the axes
+        """
+
+        # Plot the City Wards in Toronto. The borders of these polygons are
+        # plot as they are in the Shapefile
+
+        dummy = to_map.readshapefile(shapefile='./shp_dir/icitw_wgs84',
+                                     name='city_wards',
+                                     drawbounds=False, color='green')
+
+        # The set of polygons (city-wards in Toronto) to add (to plot)
+        patches = []
+        # The ten-years budget per city-ward (in same order as its
+        # geographical polygon
+        ten_yrs_bdg = []
+
+        for shape, shp_info in zip(to_map.city_wards, to_map.city_wards_info):
+            # print shp_info
+            # The GIS shapefile 'city_wards' ('icitw_wgs84') has the ward
+            # number as the field with key 'SCODE_NAME' in that shapefile
+            # (you need to .lstrip('0') from it, because, e.g., wards whose
+            # number has a single digit are padded with left '0's in the
+            # shapefile, but are nevertheless in the decimal system -just
+            # padded with '0's, that's it- but Python will understand it
+            # as in octal, not decimal syste.)
+
+            shape_ward_number = int(shp_info['SCODE_NAME'].lstrip('0'))
+
+            # the shapefile doesn't have the budget for this ward-number,
+            # but the Excel spreadsheet we had done the ETL on it did
+
+            ward_budget = self._total_budget_per_ward[shape_ward_number]
+            # print "Ward: %02d, 10-years budget: %f, Ward-name: %s" % \
+            #      (shape_ward_number, ward_budget, shp_info['NAME'])
+
+            # append this budget and its associated geographical polygon
+            ten_yrs_bdg.append(ward_budget)
+            patches.append(Polygon(np.array(shape), True))
+
+        cmap = plt.get_cmap('Greens')
+        patch_collection = PatchCollection(patches, match_original=True)
+        norm = Normalize(vmin=min(ten_yrs_bdg),
+                         vmax=max(ten_yrs_bdg))
+        patch_collection.set_facecolor(cmap(norm(ten_yrs_bdg)))
+
+        axes.add_collection(patch_collection)
 
     def plot_budget(self):
         """Plot the budget for the next years per ward in the City of
         Toronto, according to the ETL done by the previous method
         etl_excel_spreadsheet() that should have been called already
         """
-        # TODO: pending implementation of this method using matplotlib/basemap
-        pass
+        # These are the latitudes of the City of Toronto.
+        # (Fiona can be better to find them, e.g., from the 'icitw_wgs84'
+        # Shapefile below.)
+
+        low_left_corner_longitude = -79.75
+        low_left_corner_latitude = 43.40
+        up_right_corner_longitude = -79.10
+        up_right_corner_latitude = 43.95
+
+        fig = plt.figure()
+        axes = fig.add_subplot(111)
+
+        # Prepare the map of Toronto
+
+        to_map = Basemap(llcrnrlon=low_left_corner_longitude,
+                         llcrnrlat=low_left_corner_latitude,
+                         urcrnrlon=up_right_corner_longitude,
+                         urcrnrlat=up_right_corner_latitude,
+                         ellps='WGS84',
+                         resolution='h', area_thresh=5)
+
+        to_map.drawmapboundary(fill_color='white')
+
+        # Plot the City Wards in Toronto. The borders of these polygons are
+        # plot as they are in the Shapefile
+
+        self._plot_ward_budget_with_color(to_map, axes)
+
+        plt.title('Toronto Neighborhoods: ' +
+                  '10-year staff-proposed budget per ward')
+        # plt.legend()
+        plt.show()
 
 
 def main():
