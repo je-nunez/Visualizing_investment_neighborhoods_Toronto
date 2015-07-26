@@ -32,8 +32,10 @@ to the WGS84 coordinate system (if necessary).
 # The very First Version of the Visualization
 
 This is the very first version of the
-[Visualization](TO_developm_neighborhoods.png). Further work on this is
-coming.
+![Visualization](/TO_developm_neighborhoods.png?raw=true "First version of the visualization using matplotlib/basemap on ESRI shapefiles").
+
+Further work on this is coming.
+
 
 # Analysis
 
