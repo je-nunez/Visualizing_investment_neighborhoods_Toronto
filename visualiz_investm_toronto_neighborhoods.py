@@ -57,11 +57,11 @@ def visualize_investment_in_toronto():
     # (Fiona can be better to find them, e.g., from the 'icitw_wgs84' Shapefile
     #  below.)
 
-    low_left_corner_longitude = -79.10
+    low_left_corner_longitude = -79.75
     low_left_corner_latitude = 43.40
-    up_right_corner_longitude = -79.75
+    up_right_corner_longitude = -79.10
     up_right_corner_latitude = 43.95
-
+        
     fig = plt.figure()
     axes = fig.add_subplot(111)
 
