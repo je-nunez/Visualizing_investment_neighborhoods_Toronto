@@ -61,7 +61,7 @@ def visualize_investment_in_toronto():
     low_left_corner_latitude = 43.40
     up_right_corner_longitude = -79.10
     up_right_corner_latitude = 43.95
-        
+
     fig = plt.figure()
     axes = fig.add_subplot(111)
 
