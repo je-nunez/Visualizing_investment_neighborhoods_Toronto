@@ -29,6 +29,37 @@ The script `download_investm_shapefiles_toronto.sh` is given to download
 these GIS shapefiles and Excel budgets, and to prepare the GIS shapefiles
 to the WGS84 coordinate system (if necessary).
 
+# Required Libraries
+
+We need programs in the `gdal` yum package (RedHat) or `gdal-bin` (Debian)
+or `gdal` (`brew` in Mac OS/X).
+
+     yum install gdal
+     
+     apt-get install gdal
+     
+     brew install gdal
+
+(These belong to the [Geospatial Data Abstraction Library](http://www.gdal.org/))
+
+We also need the `dbfpy` Python package to verify the dBase DBF file. It
+is available here:
+
+     https://pypi.python.org/pypi/dbfpy
+
+For the visualization, we need the `matplotlib` and `Basemap` libraries in
+Python:
+
+     http://matplotlib.org/users/installing.html
+
+     http://matplotlib.org/basemap/users/installing.html
+
+as well as `NumPy`.
+
+For reading in Python the Excel spreadsheet [Budget by Wards of the City of Toronto](http://www1.toronto.ca/wps/portal/contentonly?vgnextoid=1dc340271f8e3310VgnVCM1000003dd60f89RCRD)
+inside the program `visualiz_investm_toronto_neighborhoods.py`, the `xlrd`
+[package](https://pypi.python.org/pypi/xlrd) must be installed.
+
 # The very First Version of the Visualization
 
 This is the very first version of the
