@@ -35,8 +35,58 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 from matplotlib.patches import Polygon
 from matplotlib.collections import PatchCollection
-from matplotlib.colors import Normalize
+from matplotlib.colors import Normalize, LinearSegmentedColormap
+import matplotlib.cm as cm
 import numpy as np
+
+
+# The following two functions, colorbar_index() and cmap_discretize()
+# are taken from:
+#   http://sensitivecities.com/so-youd-like-to-make-a-map-using-python-EN.html
+# and
+#
+
+# Convenience functions for working with colour ramps and bars
+def colorbar_index(ncolors, cmap, labels=None, **kwargs):
+    """
+    This is a convenience function to stop you making off-by-one errors
+    Takes a standard colour ramp, and discretizes it,
+    then draws a colour bar with correctly aligned labels
+    """
+    cmap = cmap_discretize(cmap, ncolors)
+    mappable = cm.ScalarMappable(cmap=cmap)
+    mappable.set_array([])
+    mappable.set_clim(-0.5, ncolors+0.5)
+    colorbar = plt.colorbar(mappable, **kwargs)
+    colorbar.set_ticks(np.linspace(0, ncolors, ncolors))
+    colorbar.set_ticklabels(range(ncolors))
+    if labels:
+        colorbar.set_ticklabels(labels)
+    return colorbar
+
+
+def cmap_discretize(cmap, N):
+    """
+    Return a discrete colormap from the continuous colormap cmap.
+
+        cmap: colormap instance, eg. cm.jet. 
+        N: number of colors.
+
+    Example
+        x = resize(arange(100), (5,100))
+        djet = cmap_discretize(cm.jet, 5)
+        imshow(x, cmap=djet)
+
+    """
+    if type(cmap) == str:
+        cmap = get_cmap(cmap)
+    colors_i = np.concatenate((np.linspace(0, 1., N), (0., 0., 0., 0.)))
+    colors_rgba = cmap(colors_i)
+    indices = np.linspace(0, 1., N + 1)
+    cdict = {}
+    for ki, key in enumerate(('red', 'green', 'blue')):
+        cdict[key] = [(indices[i], colors_rgba[i - 1, ki], colors_rgba[i, ki]) for i in xrange(N + 1)]
+    return LinearSegmentedColormap(cmap.name + "_%d" % N, cdict, 1024)
 
 
 def visualize_investment_in_toronto():
@@ -131,6 +181,12 @@ def visualize_investment_in_toronto():
     patches = []
     taxes = []
 
+    # Note that the taxes impact (in taxes[]) is different inside a same ward
+    # in the city of Toronto. I.e., a same ward can have different subpolygons
+    # with different tax-impact. Example, for 'ward' = 2:
+    #    {'subdiv': '19041', 'ward': 2.0, 'avgtaximpa': -56.0554, ...}
+    #    {'subdiv': '19042', 'ward': 2.0, 'avgtaximpa': -58.6994, ...}
+
     for info, shape in zip(to_map.tax_assesm_impact_info,
                            to_map.tax_assesm_impact):
         # print info
@@ -146,6 +202,52 @@ def visualize_investment_in_toronto():
     patch_collection.set_facecolor(cmap(norm(taxes)))
 
     axes.add_collection(patch_collection)
+
+    # Add a colour bar
+    cb = colorbar_index(ncolors=len(taxes), cmap=cmap, shrink=0.7,
+                         labels=taxes)
+    # Set the font-size of the label
+    cb.ax.tick_params(labelsize=7)
+
+    # Show highest densities, in descending order
+    # highest = '\n'.join(
+    #    value[1] for _, value in df_map[(df_map['jenks_bins'] == 4)][:10].sort().iterrows())
+    # highest = 'Most Dense Wards:\n\n' + highest
+
+    # Subtraction is necessary for precise y coordinate alignment
+
+    # details = cb.ax.text(
+    #    -1., 0 - 0.007,
+    #    highest,
+    #    ha='right', va='bottom',
+    #    size=5,
+    #    color='#555555')
+
+    # Add a small legend
+    # ( http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes.text )
+
+    smallprint = axes.text(
+       0.98, 0.05,
+       'This is a map of taxes and investment per wards in Toronto\nObtained from Open Data of the City of Toronto\nSee README of this project for URLs\n',
+       horizontalalignment='right', verticalalignment='bottom',
+       size=4,
+       color='#555555',
+       bbox=dict(facecolor='red', alpha=0.2),
+       transform=axes.transAxes)
+
+    # Draw a map scale
+
+    #  to_map.drawmapscale(
+    #    coords[0] + 0.08, coords[1] + 0.015,
+    #    coords[0], coords[1],
+    #    10.,
+    #    barstyle='fancy', labelstyle='simple',
+    #    fillcolor1='w', fillcolor2='#555555',
+    #    fontcolor='#555555',
+    #    zorder=5)
+
+    plt.tight_layout()
+    fig.set_size_inches(7.22, 5.25)
 
     plt.title('Toronto Neighborhoods: Priority Investment, Business ' +
               'Improvement Areas,\nand Current Value Assessment of Tax ' +
