@@ -168,7 +168,7 @@ def visualize_investment_in_toronto():
                               format='%.2f')
     # Set the font-size of the tick labels in the color bar
     clor_bar.ax.tick_params(labelsize=7)
-    clor_bar.set_label(label='Assessed Tax Impact per Area')
+    clor_bar.set_label(label='Assessed Tax Impact per Sub-Ward')
 
     # Show highest densities, in descending order
     # highest = '\n'.join(
@@ -189,7 +189,7 @@ def visualize_investment_in_toronto():
 
     smallprint = axes.text(
         0.98, 0.05,
-        'This is a map of taxes and investment per wards in Toronto\nObtained from Open Data of the City of Toronto\nSee README of this project for URLs\n',
+        'This is a map of taxes and investment per subwards in Toronto\nObtained from Open Data of the City of Toronto\nSee README of this project for URLs\n',
         horizontalalignment='right', verticalalignment='bottom',
         size=6,
         color='#555555',
