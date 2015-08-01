@@ -40,55 +40,6 @@ import matplotlib.cm as cm
 import numpy as np
 
 
-# The following two functions, colorbar_index() and cmap_discretize()
-# are taken from:
-#   http://sensitivecities.com/so-youd-like-to-make-a-map-using-python-EN.html
-# and
-#
-
-# Convenience functions for working with colour ramps and bars
-def colorbar_index(ncolors, cmap, labels=None, **kwargs):
-    """
-    This is a convenience function to stop you making off-by-one errors
-    Takes a standard colour ramp, and discretizes it,
-    then draws a colour bar with correctly aligned labels
-    """
-    cmap = cmap_discretize(cmap, ncolors)
-    mappable = cm.ScalarMappable(cmap=cmap)
-    mappable.set_array([])
-    mappable.set_clim(-0.5, ncolors+0.5)
-    colorbar = plt.colorbar(mappable, **kwargs)
-    colorbar.set_ticks(np.linspace(0, ncolors, ncolors))
-    colorbar.set_ticklabels(range(ncolors))
-    if labels:
-        colorbar.set_ticklabels(labels)
-    return colorbar
-
-
-def cmap_discretize(cmap, N):
-    """
-    Return a discrete colormap from the continuous colormap cmap.
-
-        cmap: colormap instance, eg. cm.jet. 
-        N: number of colors.
-
-    Example
-        x = resize(arange(100), (5,100))
-        djet = cmap_discretize(cm.jet, 5)
-        imshow(x, cmap=djet)
-
-    """
-    if type(cmap) == str:
-        cmap = get_cmap(cmap)
-    colors_i = np.concatenate((np.linspace(0, 1., N), (0., 0., 0., 0.)))
-    colors_rgba = cmap(colors_i)
-    indices = np.linspace(0, 1., N + 1)
-    cdict = {}
-    for ki, key in enumerate(('red', 'green', 'blue')):
-        cdict[key] = [(indices[i], colors_rgba[i - 1, ki], colors_rgba[i, ki]) for i in xrange(N + 1)]
-    return LinearSegmentedColormap(cmap.name + "_%d" % N, cdict, 1024)
-
-
 def visualize_investment_in_toronto():
     """Function to visualize the investment in the neighborhoods of
     Toronto.
@@ -198,16 +149,26 @@ def visualize_investment_in_toronto():
 
     cmap = plt.get_cmap('Reds')
     patch_collection = PatchCollection(patches, match_original=True)
-    norm = Normalize(vmin=min(taxes), vmax=max(taxes))
+    min_taxes = min(taxes)
+    max_taxes = max(taxes)
+    norm = Normalize(min_taxes, max_taxes)
     patch_collection.set_facecolor(cmap(norm(taxes)))
 
     axes.add_collection(patch_collection)
 
     # Add a colour bar
-    cb = colorbar_index(ncolors=len(taxes), cmap=cmap, shrink=0.7,
-                         labels=taxes)
-    # Set the font-size of the label
-    cb.ax.tick_params(labelsize=7)
+    delta_gradient_taxes = max_taxes - min_taxes
+    color_bar_taxes = [min_taxes]
+    for i in range(1, 6):
+        color_bar_taxes.append(min_taxes + (i/6.0) * delta_gradient_taxes)
+    color_bar_taxes.append(max_taxes)
+
+    clor_bar = colorbar_index(ncolors=len(color_bar_taxes), cmap=cmap,
+                              shrink=0.6, labels=color_bar_taxes,
+                              format='%.2f')
+    # Set the font-size of the tick labels in the color bar
+    clor_bar.ax.tick_params(labelsize=7)
+    clor_bar.set_label(label='Assessed Tax Impact per Area')
 
     # Show highest densities, in descending order
     # highest = '\n'.join(
@@ -216,7 +177,7 @@ def visualize_investment_in_toronto():
 
     # Subtraction is necessary for precise y coordinate alignment
 
-    # details = cb.ax.text(
+    # details = clor_bar.ax.text(
     #    -1., 0 - 0.007,
     #    highest,
     #    ha='right', va='bottom',
@@ -227,13 +188,13 @@ def visualize_investment_in_toronto():
     # ( http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes.text )
 
     smallprint = axes.text(
-       0.98, 0.05,
-       'This is a map of taxes and investment per wards in Toronto\nObtained from Open Data of the City of Toronto\nSee README of this project for URLs\n',
-       horizontalalignment='right', verticalalignment='bottom',
-       size=4,
-       color='#555555',
-       bbox=dict(facecolor='red', alpha=0.2),
-       transform=axes.transAxes)
+        0.98, 0.05,
+        'This is a map of taxes and investment per wards in Toronto\nObtained from Open Data of the City of Toronto\nSee README of this project for URLs\n',
+        horizontalalignment='right', verticalalignment='bottom',
+        size=6,
+        color='#555555',
+        bbox=dict(facecolor='red', alpha=0.2),
+        transform=axes.transAxes)
 
     # Draw a map scale
 
@@ -246,13 +207,14 @@ def visualize_investment_in_toronto():
     #    fontcolor='#555555',
     #    zorder=5)
 
-    plt.tight_layout()
-    fig.set_size_inches(7.22, 5.25)
+    fig.set_tight_layout(True)
+    fig.set_size_inches(8, 6.5)
 
     plt.title('Toronto Neighborhoods: Priority Investment, Business ' +
               'Improvement Areas,\nand Current Value Assessment of Tax ' +
               'Impact on Residential Properties')
     # plt.legend()
+    fig.savefig('TO_developm_neighborhoods.png')
     plt.show()
 
 
@@ -264,6 +226,56 @@ def main():
     """
 
     visualize_investment_in_toronto()
+
+
+# The following two functions, colorbar_index() and cmap_discretize()
+# are taken from, with some very minor changes:
+#   http://sensitivecities.com/so-youd-like-to-make-a-map-using-python-EN.html
+# and
+#   http://brandonrose.org/pythonmap
+
+# Convenience functions for working with colour ramps and bars
+def colorbar_index(ncolors, cmap, labels=None, **kwargs):
+    """
+    This is a convenience function to stop you making off-by-one errors
+    Takes a standard colour ramp, and discretizes it,
+    then draws a colour bar with correctly aligned labels
+    """
+    cmap = cmap_discretize(cmap, ncolors)
+    mappable = cm.ScalarMappable(cmap=cmap)
+    mappable.set_array([])
+    mappable.set_clim(-0.5, ncolors+0.5)
+    colorbar = plt.colorbar(mappable, **kwargs)
+    colorbar.set_ticks(np.linspace(0, ncolors, ncolors))
+    colorbar.set_ticklabels(range(ncolors))
+    if labels:
+        colorbar.set_ticklabels(labels)
+    return colorbar
+
+
+def cmap_discretize(cmap, num):
+    """
+    Return a discrete colormap from the continuous colormap cmap.
+
+        cmap: colormap instance, eg. cm.jet.
+        num: number of colors.
+
+    Example
+        x = resize(arange(100), (5,100))
+        djet = cmap_discretize(cm.jet, 5)
+        imshow(x, cmap=djet)
+
+    """
+    if isinstance(cmap, str):
+        cmap = plt.get_cmap(cmap)
+    colors_i = np.concatenate((np.linspace(0, 1., num), (0., 0., 0., 0.)))
+    colors_rgba = cmap(colors_i)
+    indices = np.linspace(0, 1., num + 1)
+    cdict = {}
+    for c_i, key in enumerate(('red', 'green', 'blue')):
+        cdict[key] = [(indices[i], colors_rgba[i - 1, c_i], colors_rgba[i, c_i])
+                      for i in xrange(num + 1)]
+    return LinearSegmentedColormap(cmap.name + "_%d" % num, cdict, 1024)
 
 
 if __name__ == '__main__':
