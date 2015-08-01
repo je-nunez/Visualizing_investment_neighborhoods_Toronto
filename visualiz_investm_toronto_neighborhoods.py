@@ -5,6 +5,7 @@
 #
 # pylint: disable=no-name-in-module
 # pylint: disable=import-error
+# pylint: disable=no-member
 
 """Visualize in the same geographical map the following information about
 the different neighborhoods of Toronto, using the ESRI Shapefiles below
@@ -40,9 +41,59 @@ import matplotlib.cm as cm
 import numpy as np
 
 
+def draw_basic_map_of_toronto(axis):
+    """Draw a basic map of Toronto.
+
+    :param axis: where to draw the map
+    :returns: Basemap with Toronto
+    """
+    # These are the latitudes of the City of Toronto.
+    # (Fiona can be better to find them, e.g., from the 'icitw_wgs84' Shapefile
+    #  below.)
+
+    low_left_corner_longitude = -79.75
+    low_left_corner_latitude = 43.40
+    up_right_corner_longitude = -79.10
+    up_right_corner_latitude = 43.95
+
+    to_map = Basemap(llcrnrlon=low_left_corner_longitude,
+                     llcrnrlat=low_left_corner_latitude,
+                     urcrnrlon=up_right_corner_longitude,
+                     urcrnrlat=up_right_corner_latitude,
+                     ellps='WGS84',
+                     resolution='h', area_thresh=1000,
+                     ax=axis)
+
+    to_map.drawmapboundary(fill_color='white')
+    return to_map
+
+
+def draw_toronto_and_city_wards(axis):
+    """Draw a basic map of Toronto with also the division among
+    its city wards.
+
+    :param axis: where to draw the map
+    :returns: Basemap with Toronto
+    """
+
+    to_map = draw_basic_map_of_toronto(axis)
+
+    # Plot the City Wards in Toronto. The borders of these polygons are plot as
+    # they are in the Shapefile
+
+    dummy = to_map.readshapefile(shapefile='./shp_dir/icitw_wgs84',
+                                 name='city_wards',
+                                 drawbounds=True, color='green')
+
+    return to_map
+
+
 def visualize_investment_in_toronto():
     """Function to visualize the investment in the neighborhoods of
     Toronto.
+
+    This function is too big, it will be splitted in several parts according
+    to the visualization they do.
 
     It plots these ESRI Shapefiles from Toronto using matplotlib/basemap/etc.
     (These shapefiles are available as Open Data from the City of Toronto):
@@ -54,35 +105,20 @@ def visualize_investment_in_toronto():
        in the City of Toronto (last year available, 2011)
     """
 
-    # These are the latitudes of the City of Toronto.
-    # (Fiona can be better to find them, e.g., from the 'icitw_wgs84' Shapefile
-    #  below.)
-
-    low_left_corner_longitude = -79.75
-    low_left_corner_latitude = 43.40
-    up_right_corner_longitude = -79.10
-    up_right_corner_latitude = 43.95
-
     fig = plt.figure()
-    axes = fig.add_subplot(111)
 
-    # Prepare the map of Toronto
+    axes = [None, None, None]
+    # grid of 2x2 rows and colums for the subplots with differ. visualizations
+    axes[0] = plt.subplot2grid((2, 2), (0, 0))
+    axes[1] = plt.subplot2grid((2, 2), (0, 1))
+    axes[2] = plt.subplot2grid((2, 2), (1, 0), colspan=2)
 
-    to_map = Basemap(llcrnrlon=low_left_corner_longitude,
-                     llcrnrlat=low_left_corner_latitude,
-                     urcrnrlon=up_right_corner_longitude,
-                     urcrnrlat=up_right_corner_latitude,
-                     ellps='WGS84',
-                     resolution='h', area_thresh=1000)
+    # axes = fig.add_subplot(111)
 
-    to_map.drawmapboundary(fill_color='white')
+    # First map is the Priority investment by the City of Toronto
 
-    # Plot the City Wards in Toronto. The borders of these polygons are plot as
-    # they are in the Shapefile
-
-    dummy = to_map.readshapefile(shapefile='./shp_dir/icitw_wgs84',
-                                 name='city_wards',
-                                 drawbounds=True, color='green')
+    axes[0].set_title("Priority investment by the City of Toronto")
+    to_map = draw_toronto_and_city_wards(axis=axes[0])
 
     # Read the Shapefile of the Priority Investment Neighborhoods in Toronto.
     # The Shapefile is read first and its polygons are filled with the color
@@ -98,12 +134,16 @@ def visualize_investment_in_toronto():
         # print info
         patches.append(Polygon(np.array(shape), True))
 
-    axes.add_collection(PatchCollection(patches, facecolor='m', edgecolor='k',
-                                        linewidths=1., zorder=3))
+    axes[0].add_collection(PatchCollection(patches, facecolor='m',
+                                           edgecolor='k', linewidths=1.,
+                                           zorder=3))
 
     # Read the Shapefile of the Business Improvement Areas in Toronto.
     # The Shapefile is read first and its polygons are filled with the color
     # 'facecolor' in a for-loop below
+
+    axes[1].set_title("Business Improvement Areas of Toronto")
+    to_map = draw_toronto_and_city_wards(axis=axes[1])
 
     dummy = to_map.readshapefile(shapefile='./shp_dir/TO_busin_improv_area',
                                  name='busin_improv',
@@ -115,8 +155,9 @@ def visualize_investment_in_toronto():
         # print info
         patches.append(Polygon(np.array(shape), True))
 
-    axes.add_collection(PatchCollection(patches, facecolor='g', edgecolor='k',
-                                        linewidths=1., zorder=2))
+    axes[1].add_collection(PatchCollection(patches, facecolor='g',
+                                           edgecolor='k', linewidths=1.,
+                                           zorder=2))
 
     # Read the Shapefile of the Estimated Tax Impact in Toronto.
     # The way to plot this Shapefile is different than the previous one, since
@@ -124,6 +165,9 @@ def visualize_investment_in_toronto():
     # associated to each of its polygons, so the different tonalities of
     # 'facecolor' in its polygons represent the Avg Tax Impact value in each
     # polygon
+
+    axes[2].set_title("Current Value and Assessed Tax Impact per Sub-Ward")
+    to_map = draw_basic_map_of_toronto(axis=axes[2])
 
     dummy = to_map.readshapefile(shapefile='shp_dir/CVA_2011_Tax_Impact_WGS84',
                                  name='tax_assesm_impact',
@@ -154,7 +198,7 @@ def visualize_investment_in_toronto():
     norm = Normalize(min_taxes, max_taxes)
     patch_collection.set_facecolor(cmap(norm(taxes)))
 
-    axes.add_collection(patch_collection)
+    axes[2].add_collection(patch_collection)
 
     # Add a colour bar
     delta_gradient_taxes = max_taxes - min_taxes
@@ -164,11 +208,11 @@ def visualize_investment_in_toronto():
     color_bar_taxes.append(max_taxes)
 
     clor_bar = colorbar_index(ncolors=len(color_bar_taxes), cmap=cmap,
-                              shrink=0.6, labels=color_bar_taxes,
-                              format='%.2f')
+                              shrink=0.7, labels=color_bar_taxes,
+                              format='%.2f', ax=axes[2])
     # Set the font-size of the tick labels in the color bar
     clor_bar.ax.tick_params(labelsize=7)
-    clor_bar.set_label(label='Assessed Tax Impact per Sub-Ward')
+    clor_bar.set_label(label='Tax Impact')
 
     # Show highest densities, in descending order
     # highest = '\n'.join(
@@ -187,14 +231,16 @@ def visualize_investment_in_toronto():
     # Add a small legend
     # ( http://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes.text )
 
-    smallprint = axes.text(
-        0.98, 0.05,
-        'This is a map of taxes and investment per subwards in Toronto\nObtained from Open Data of the City of Toronto\nSee README of this project for URLs\n',
-        horizontalalignment='right', verticalalignment='bottom',
-        size=6,
-        color='#555555',
-        bbox=dict(facecolor='red', alpha=0.2),
-        transform=axes.transAxes)
+    # dummy = axes[2].text(
+    #    0.98, 0.05,
+    #    'This is a map of taxes and investment per subwards in Toronto\n' +
+    #    'Obtained from Open Data of the City of Toronto\n' +
+    #    'See README of this project for URLs\n',
+    #    horizontalalignment='right', verticalalignment='bottom',
+    #    size=6,
+    #    color='#555555',
+    #    bbox=dict(facecolor='red', alpha=0.2),
+    #    transform=axes[2].transAxes)
 
     # Draw a map scale
 
@@ -208,11 +254,11 @@ def visualize_investment_in_toronto():
     #    zorder=5)
 
     fig.set_tight_layout(True)
-    fig.set_size_inches(8, 6.5)
+    fig.set_size_inches(9, 7)
 
-    plt.title('Toronto Neighborhoods: Priority Investment, Business ' +
-              'Improvement Areas,\nand Current Value Assessment of Tax ' +
-              'Impact on Residential Properties')
+    # plt.title('Toronto Neighborhoods: Priority Investment, Business ' +
+    #          'Improvement Areas,\nand Current Value Assessment of Tax ' +
+    #          'Impact on Residential Properties')
     # plt.legend()
     fig.savefig('TO_developm_neighborhoods.png')
     plt.show()
