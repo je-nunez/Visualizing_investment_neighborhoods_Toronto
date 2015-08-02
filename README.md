@@ -42,11 +42,6 @@ or `gdal` (`brew` in Mac OS/X).
 
 (These belong to the [Geospatial Data Abstraction Library](http://www.gdal.org/))
 
-We also need the `dbfpy` Python package to verify the dBase DBF file. It
-is available here:
-
-     https://pypi.python.org/pypi/dbfpy
-
 For the visualization, we need the `matplotlib` and `Basemap` libraries in
 Python:
 
