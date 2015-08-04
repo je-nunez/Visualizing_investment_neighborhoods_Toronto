@@ -61,7 +61,7 @@ def draw_basic_map_of_toronto(axis):
                      urcrnrlon=up_right_corner_longitude,
                      urcrnrlat=up_right_corner_latitude,
                      ellps='WGS84',
-                     resolution='h', area_thresh=1000,
+                     resolution='h', area_thresh=0.1,
                      ax=axis)
 
     to_map.drawmapboundary(fill_color='white')
@@ -260,7 +260,7 @@ def visualize_investment_in_toronto():
     #          'Improvement Areas,\nand Current Value Assessment of Tax ' +
     #          'Impact on Residential Properties')
     # plt.legend()
-    fig.savefig('TO_developm_neighborhoods.png')
+    fig.savefig('TO_developm_neighborhoods.png', dpi=600)
     plt.show()
 
 
